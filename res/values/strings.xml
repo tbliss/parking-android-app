@@ -1,0 +1,30 @@
+<resources>
+
+    <string name="app_name">Parking App</string>
+    <string name="hello_world">Hello world!!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">Parking App</string>
+    
+    <string name="street_cleaning_title">Street Cleaning Day</string>
+    
+    <string name="none">None</string>
+    <string name="monday">Monday</string>
+	<string name="tuesday">Tuesday</string>
+	<string name="wednesday">Wednesday</string>
+	<string name="thursday">Thursday</string>
+	<string name="friday">Friday</string>
+	
+	<string-array name="time_array">
+	    <item>8:00</item>
+	    <item>9:00</item>
+	    <item>10:00</item>
+	    <item>11:00</item>
+	    <item>12:00</item>
+	    <item>1:00</item>
+	    <item>2:00</item>
+	    <item>3:00</item>
+	    <item>4:00</item>
+	    <item>5:00</item>
+	</string-array>
+	
+</resources>
