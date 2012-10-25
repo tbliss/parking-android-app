@@ -13,6 +13,7 @@
 	<string name="wednesday">Wednesday</string>
 	<string name="thursday">Thursday</string>
 	<string name="friday">Friday</string>
+	<string name="save_button">Save Parking Spot</string>
 	
 	<string-array name="time_array">
 	    <item>8:00</item>
