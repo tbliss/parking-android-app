@@ -13,9 +13,13 @@
 	<string name="wednesday">Wednesday</string>
 	<string name="thursday">Thursday</string>
 	<string name="friday">Friday</string>
+	<string name="waiting_for_location">Waiting For Current Location...</string>
 	<string name="save_button">Save Parking Spot</string>
+	<string name="get_location_button">Get Parking Location</string>
+	<string name="set_reminder_button">Set Calendar Reminder</string>
 	
 	<string-array name="time_array">
+	    <item>7:00</item>
 	    <item>8:00</item>
 	    <item>9:00</item>
 	    <item>10:00</item>

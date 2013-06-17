@@ -2,10 +2,12 @@ package com.tbliss.parkingapp;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -20,7 +22,7 @@ import android.widget.Spinner;
 
 public class MainActivity extends Activity implements OnItemSelectedListener, LocationListener {
 	private static final String LOG_TAG = "MainActivity";
-	
+
 	// GPS
 	private LocationManager mLocManager;
 	private Location mCurrLoc;
@@ -32,8 +34,6 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
 	private DAY mCurrDay = DAY.NONE;
 	
 	// Saved data
-	private String mSavedTime;
-	private DAY mSavedDay;
 	private double mSavedLat;
 	private double mSavedLon;
 	
@@ -48,28 +48,28 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
         // set None as default street cleaning day
         RadioButton noneDay = (RadioButton) findViewById(R.id.radio_none);
         noneDay.setChecked(true);
-        
+
         mSaveButton = (Button) findViewById(R.id.save_button);
-        
+
         initSpinner();
-        
+
         mLocManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
     }
-    
+
     @Override
     public void onPause() {
     	super.onPause();
-    	
+
     	// Save data
     	SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
     	editor.putString("time", mCurrTime);
     	editor.putString("day", mCurrDay.toString());
     	editor.commit();
-    	
+
     	mLocManager.removeUpdates(this);
     }
     
@@ -78,11 +78,12 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
     	super.onResume();
     	mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_LOC, this);
         mSaveButton.setEnabled(false); // wait for first location update
+        mSaveButton.setText(R.string.waiting_for_location);
         
         SharedPreferences sharedPrefs = getPreferences(Context.MODE_PRIVATE);
         String time = sharedPrefs.getString("time", "8:00");
         String day = sharedPrefs.getString("day", "NONE");
-        
+
         setTime(time);
         setDay(day);
     }
@@ -135,7 +136,7 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
     	spinner.setAdapter(adapter);
     	spinner.setOnItemSelectedListener(this);
     }
-    
+
     public void onRadioButtonClicked(View view) {
         boolean checked = ((RadioButton) view).isChecked();
         
@@ -175,25 +176,43 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
 		Log.v(LOG_TAG, mCurrTime);
 	}
 
-	public void onNothingSelected(AdapterView<?> arg0) {
-		Log.v(LOG_TAG, "meep2");
-	}
-	
-	// Callback for Save parking button
+	public void onNothingSelected(AdapterView<?> arg0) {}
+
+	/**
+	 * Callback for Save parking button
+	 */
 	public void saveParking(View view) {
-		Log.v(LOG_TAG, "***time: " + mCurrTime + ", day: " + mCurrDay);
-		Log.v(LOG_TAG, "lat: " + mCurrLoc.getLatitude() + ", lon: " + mCurrLoc.getLongitude());
-		
-		mSavedTime = mCurrTime;
-		mSavedDay = mCurrDay;
+		Log.v(LOG_TAG, "saveParking() time: " + mCurrTime + ", day: " + mCurrDay);
+		Log.v(LOG_TAG, "saveParking() lat: " + mCurrLoc.getLatitude() + ", lon: " + mCurrLoc.getLongitude());
+
 		mSavedLat = mCurrLoc.getLatitude();
 		mSavedLon = mCurrLoc.getLongitude();
 	}
 
+	/**
+	 * Callback for Get Parking Spot button.
+	 */
+	public void getParkingLocation(View view) {
+		Log.v(LOG_TAG, "getParkingLocation(): " + mSavedLat + ", " + mSavedLon);
+		String uri = String.format("http://maps.google.com/maps?saddr=37.777964,-122.441783&daddr=%s,%s&mode=walking", 
+				"" + mSavedLat, "" + mSavedLon);
+		Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
+		startActivity(intent);
+	}
+
+	/**
+	 * Callback for Set Calendar Reminder button.
+	 */
+	public void setCalendarReminder(View view) {
+		Log.v(LOG_TAG, "setCalendarReminder");
+		
+	}
+
 	public void onLocationChanged(Location location) {
-		Log.v(LOG_TAG, "locationChange");
+		// Log.v(LOG_TAG, "locationChange");
 		mCurrLoc = location;
         mSaveButton.setEnabled(true);
+        mSaveButton.setText(R.string.save_button);
 	}
 
 	public void onProviderDisabled(String provider) {}
