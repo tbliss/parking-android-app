@@ -7,13 +7,7 @@
     
     <string name="street_cleaning_title">Street Cleaning Day</string>
     
-    <string name="none">None</string>
-    <string name="monday">Monday</string>
-	<string name="tuesday">Tuesday</string>
-	<string name="wednesday">Wednesday</string>
-	<string name="thursday">Thursday</string>
-	<string name="friday">Friday</string>
-	<string name="waiting_for_location">Waiting For Current Location...</string>
+	<string name="waiting_for_location">Waiting For Current Location&#8230;</string>
 	<string name="save_button">Save Parking Spot</string>
 	<string name="get_location_button">Get Parking Location</string>
 	<string name="set_reminder_button">Set Calendar Reminder</string>
@@ -31,5 +25,16 @@
 	    <item>4:00</item>
 	    <item>5:00</item>
 	</string-array>
+	
+    <string-array name="day_array">
+        <item>None</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+        <item>Sunday</item>
+    </string-array>
 	
 </resources>

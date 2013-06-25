@@ -34,8 +34,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 
 public class MainActivity extends Activity implements OnItemSelectedListener, LocationListener {
@@ -49,7 +47,7 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
 
 	// Current user selection
 	private String mCurrTime = "8:00";
-	private DAY mCurrDay = DAY.NONE;
+	private long mCurrDay = 0;
 
 	// Saved data
 	private double mSavedLat;
@@ -58,22 +56,14 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
 	// Layouts
 	private Button mSaveButton;
 
-	private enum DAY {
-		NONE, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY
-	}
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // set None as default street cleaning day
-        RadioButton noneDay = (RadioButton) findViewById(R.id.radio_none);
-        noneDay.setChecked(true);
-
         mSaveButton = (Button) findViewById(R.id.save_button);
 
-        initSpinner();
+        initSpinners();
 
         mLocManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
     }
@@ -85,7 +75,7 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
         // Save data
         SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
         editor.putString("time", mCurrTime);
-        editor.putString("day", mCurrDay.toString());
+        editor.putLong("day", mCurrDay);
         editor.putString("lat", "" + mSavedLat);
         editor.putString("lon", "" + mSavedLon);
         editor.commit();
@@ -96,13 +86,14 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
     @Override
     public void onResume() {
         super.onResume();
+
         mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_LOC, this);
         mSaveButton.setEnabled(false); // wait for first location update
         mSaveButton.setText(R.string.waiting_for_location);
 
         SharedPreferences sharedPrefs = getPreferences(Context.MODE_PRIVATE);
         String time = sharedPrefs.getString("time", "8:00");
-        String day = sharedPrefs.getString("day", "NONE");
+        long day = sharedPrefs.getLong("day", 0);
         setTime(time);
         setDay(day);
         String lat = sharedPrefs.getString("lat", "0.0");
@@ -113,29 +104,6 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
         Log.i(LOG_TAG, "onResume() lat: " + mSavedLat + ", lon: " + mSavedLon);
     }
 
-    private void setDay(String day) {
-        RadioGroup radioGroup = (RadioGroup)findViewById(R.id.days_group);
-        if (day.equals("MONDAY")) {
-            mCurrDay = DAY.MONDAY;
-            radioGroup.check(R.id.radio_monday);
-        } else if (day.equals("TUESDAY")) {
-            mCurrDay = DAY.TUESDAY;
-            radioGroup.check(R.id.radio_tuesday);
-        } else if (day.equals("WEDNESDAY")) {
-            mCurrDay = DAY.WEDNESDAY;
-            radioGroup.check(R.id.radio_wednesday);
-        } else if (day.equals("THURSDAY")) {
-            mCurrDay = DAY.THURSDAY;
-            radioGroup.check(R.id.radio_thursday);
-        } else if (day.equals("FRIDAY")) {
-            mCurrDay = DAY.FRIDAY;
-            radioGroup.check(R.id.radio_friday);
-        } else {
-            mCurrDay = DAY.NONE;
-            radioGroup.check(R.id.radio_none);
-        }
-    }
-
 	@SuppressWarnings("unchecked") // ArrayAdapter
     private void setTime(String time) {
 	    mCurrTime = time;
@@ -144,60 +112,48 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
     	int position = arrayAdap.getPosition(time);
     	spinner.setSelection(position);
     }
+	
+	private void setDay(long day) {
+	    mCurrDay = day;
+	    Spinner spinner = (Spinner) findViewById(R.id.day_spinner);
+	    int dayInt = (int)day;
+	    spinner.setSelection(dayInt);
+	}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
     }
-    
-    private void initSpinner() {
-    	Spinner spinner = (Spinner) findViewById(R.id.time_spinner);
-    	// Create an ArrayAdapter using the string array and a default spinner layout
-    	ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+
+    private void initSpinners() {
+        // Time of day
+    	Spinner timeSpinner = (Spinner) findViewById(R.id.time_spinner);
+    	ArrayAdapter<CharSequence> timeAdapter = ArrayAdapter.createFromResource(this,
     	        R.array.time_array, android.R.layout.simple_spinner_item);
-    	// Specify the layout to use when the list of choices appears
-    	adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    	spinner.setAdapter(adapter);
-    	spinner.setOnItemSelectedListener(this);
-    }
-
-    public void onRadioButtonClicked(View view) {
-        boolean checked = ((RadioButton) view).isChecked();
-
-        switch(view.getId()) {
-        	case R.id.radio_none:
-        		if (checked)
-        			mCurrDay = DAY.NONE;
-        		break;
-            case R.id.radio_monday:
-                if (checked)
-                	mCurrDay = DAY.MONDAY;
-                break;
-            case R.id.radio_tuesday:
-                if (checked)
-                	mCurrDay = DAY.TUESDAY;
-                break;
-            case R.id.radio_wednesday:
-                if (checked)
-                	mCurrDay = DAY.WEDNESDAY;
-                break;
-            case R.id.radio_thursday:
-                if (checked)
-                	mCurrDay = DAY.THURSDAY;
-                break;
-            case R.id.radio_friday:
-                if (checked)
-                	mCurrDay = DAY.FRIDAY;
-                break;
-            default:
-            	// Should never be here...
-            	break;
-        }
+    	timeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    	timeSpinner.setAdapter(timeAdapter);
+    	timeSpinner.setOnItemSelectedListener(this);
+    	
+    	// Day of week
+    	Spinner daySpinner = (Spinner) findViewById(R.id.day_spinner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> dayAdapter = ArrayAdapter.createFromResource(this,
+                R.array.day_array, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        dayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        daySpinner.setAdapter(dayAdapter);
+        daySpinner.setOnItemSelectedListener(this);
     }
 
 	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-	    mCurrTime = (String) parent.getItemAtPosition(pos);
+	    switch(parent.getId()) {
+	    case R.id.time_spinner:
+	        mCurrTime = (String) parent.getItemAtPosition(pos);
+	        break;
+	    case R.id.day_spinner:
+	        mCurrDay = id;
+	    }
 	}
 
 	public void onNothingSelected(AdapterView<?> arg0) {}

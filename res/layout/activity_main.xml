@@ -13,51 +13,20 @@
         android:textSize="20sp"
         android:text="@string/street_cleaning_title"
         tools:context=".MainActivity" />
-    
-    <RadioGroup
-        android:id="@+id/days_group"
+
+    <Spinner
+        android:id="@+id/day_spinner"
+        android:layout_below="@id/street_cleaning_title"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="30dp"
-        android:layout_below="@id/street_cleaning_title">
-        <RadioButton android:id="@+id/radio_none"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/none"
-	        android:onClick="onRadioButtonClicked"/>
-        <RadioButton android:id="@+id/radio_monday"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/monday"
-	        android:onClick="onRadioButtonClicked"/>
-	    <RadioButton android:id="@+id/radio_tuesday"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/tuesday"
-	        android:onClick="onRadioButtonClicked"/>
-	    <RadioButton android:id="@+id/radio_wednesday"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/wednesday"
-	        android:onClick="onRadioButtonClicked"/>
-	    <RadioButton android:id="@+id/radio_thursday"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/thursday"
-	        android:onClick="onRadioButtonClicked"/>
-	    <RadioButton android:id="@+id/radio_friday"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/friday"
-	        android:onClick="onRadioButtonClicked"/>
-	</RadioGroup>
-	
+        android:layout_marginTop="10dp" />
+
     <Spinner
         android:id="@+id/time_spinner"
-        android:layout_below="@id/days_group"
+        android:layout_below="@id/day_spinner"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp" />
 
     <Button
         android:id="@+id/save_button"
