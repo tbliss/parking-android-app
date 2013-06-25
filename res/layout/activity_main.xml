@@ -61,16 +61,18 @@
 
     <Button
         android:id="@+id/save_button"
-        android:text="@string/waiting_for_location"
-        android:onClick="saveParking"
-        android:layout_alignParentBottom="true"
         android:layout_height="wrap_content"
-        android:layout_width="fill_parent" />
+        android:layout_width="fill_parent"
+        android:layout_marginTop="10dp"
+        android:layout_alignParentBottom="true"
+        android:onClick="saveParking"
+        android:text="@string/waiting_for_location" />
 
     <Button
         android:id="@+id/get_location_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:layout_above="@+id/save_button"
         android:layout_alignParentLeft="true"
         android:onClick="getParkingLocation"
@@ -80,6 +82,7 @@
         android:id="@+id/set_reminder_button"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:layout_above="@id/get_location_button"
         android:layout_alignParentLeft="true"
         android:onClick="setCalendarReminder"
