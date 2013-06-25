@@ -34,6 +34,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 
 public class MainActivity extends Activity implements OnItemSelectedListener, LocationListener {
@@ -46,7 +47,7 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
 	private float MIN_LOC = 0;
 
 	// Current user selection
-	private String mCurrTime = "8:00";
+	private long mCurrTime = 0;
 	private long mCurrDay = 0;
 
 	// Saved data
@@ -55,6 +56,7 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
 
 	// Layouts
 	private Button mSaveButton;
+	private EditText mEditText;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,6 +64,7 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
         setContentView(R.layout.activity_main);
 
         mSaveButton = (Button) findViewById(R.id.save_button);
+        mEditText = (EditText) findViewById(R.id.note_editText);
 
         initSpinners();
 
@@ -74,10 +77,11 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
 
         // Save data
         SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
-        editor.putString("time", mCurrTime);
+        editor.putLong("time", mCurrTime);
         editor.putLong("day", mCurrDay);
         editor.putString("lat", "" + mSavedLat);
         editor.putString("lon", "" + mSavedLon);
+        editor.putString("notes", mEditText.getText().toString());
         editor.commit();
 
         mLocManager.removeUpdates(this);
@@ -92,32 +96,30 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
         mSaveButton.setText(R.string.waiting_for_location);
 
         SharedPreferences sharedPrefs = getPreferences(Context.MODE_PRIVATE);
-        String time = sharedPrefs.getString("time", "8:00");
+        Long time = sharedPrefs.getLong("time", 0);
         long day = sharedPrefs.getLong("day", 0);
         setTime(time);
         setDay(day);
+
         String lat = sharedPrefs.getString("lat", "0.0");
         String lon = sharedPrefs.getString("lon", "0.0");
         mSavedLat = Double.parseDouble(lat);
         mSavedLon = Double.parseDouble(lon);
-
-        Log.i(LOG_TAG, "onResume() lat: " + mSavedLat + ", lon: " + mSavedLon);
+        
+        String notes = sharedPrefs.getString("notes", "");
+        mEditText.setText(notes);
     }
 
-	@SuppressWarnings("unchecked") // ArrayAdapter
-    private void setTime(String time) {
+	private void setTime(long time) {
 	    mCurrTime = time;
     	Spinner spinner = (Spinner) findViewById(R.id.time_spinner);   	
-    	ArrayAdapter<String> arrayAdap = (ArrayAdapter<String>) spinner.getAdapter();
-    	int position = arrayAdap.getPosition(time);
-    	spinner.setSelection(position);
+    	spinner.setSelection((int)time);
     }
 	
 	private void setDay(long day) {
 	    mCurrDay = day;
 	    Spinner spinner = (Spinner) findViewById(R.id.day_spinner);
-	    int dayInt = (int)day;
-	    spinner.setSelection(dayInt);
+	    spinner.setSelection((int)day);
 	}
 
     @Override
@@ -149,10 +151,11 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
 	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 	    switch(parent.getId()) {
 	    case R.id.time_spinner:
-	        mCurrTime = (String) parent.getItemAtPosition(pos);
+	        mCurrTime = id;
 	        break;
 	    case R.id.day_spinner:
 	        mCurrDay = id;
+	        break;
 	    }
 	}
 
@@ -179,6 +182,10 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
 		Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
 		startActivity(intent);
 	}
+	
+	public void clearEditText(View view) {
+	    mEditText.setText("");
+	}
 
 	/**
 	 * Callback for Set Calendar Reminder button.
@@ -189,7 +196,7 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
 	    calIntent.putExtra(Events.TITLE, "Move car for street cleaning");
 	    startActivity(calIntent);
 	}
-	
+
 	private Calendar parkingTime() {
 	    Calendar cal = Calendar.getInstance();
         int year = cal.get(Calendar.YEAR);

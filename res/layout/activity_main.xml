@@ -27,6 +27,32 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp" />
+    
+    <FrameLayout
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@id/time_spinner"
+	    android:layout_marginTop="9dp"
+	    android:padding="5dp">
+
+        <EditText
+	        android:id="@+id/note_editText"
+	        android:hint="@string/editText_hint"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_marginTop="30dp" 
+	        android:inputType="textCapSentences|textAutoCorrect|textMultiLine"/>
+
+        <Button
+	        android:id="@+id/delete_button"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginRight="10dp"
+	        android:layout_gravity="right|center_vertical"
+	        android:contentDescription="@string/delete_button_description"
+	        android:text="X"
+	        android:onClick="clearEditText" />
+    </FrameLayout>
 
     <Button
         android:id="@+id/save_button"
@@ -42,7 +68,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:layout_above="@+id/save_button"
+        android:layout_above="@id/save_button"
         android:layout_alignParentLeft="true"
         android:onClick="getParkingLocation"
         android:text="@string/get_location_button" />
