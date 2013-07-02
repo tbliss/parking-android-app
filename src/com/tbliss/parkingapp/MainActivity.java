@@ -151,6 +151,7 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
 	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 	    switch(parent.getId()) {
 	    case R.id.time_spinner:
+	        Log.i(LOG_TAG, "time: " + id);
 	        mCurrTime = id;
 	        break;
 	    case R.id.day_spinner:
@@ -177,8 +178,8 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
 	 */
 	public void getParkingLocation(View view) {
 		Log.v(LOG_TAG, "getParkingLocation(): " + mSavedLat + ", " + mSavedLon);
-		String uri = String.format("http://maps.google.com/maps?saddr=37.777964,-122.441783&daddr=%s,%s&mode=walking", 
-				"" + mSavedLat, "" + mSavedLon);
+		String uri = String.format("http://maps.google.com/maps?saddr=37.777964,-122.441783&daddr=%s,%s", ""
+		            + mSavedLat, "" + mSavedLon);
 		Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
 		startActivity(intent);
 	}
@@ -189,21 +190,41 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
 
 	/**
 	 * Callback for Set Calendar Reminder button.
-	 */
+	 */    
 	public void setCalendarReminder(View view) {
 	    Intent calIntent = new Intent(Intent.ACTION_INSERT);
 	    calIntent.setType("vnd.android.cursor.item/event");
 	    calIntent.putExtra(Events.TITLE, "Move car for street cleaning");
+	    calIntent.putExtra(Events.DESCRIPTION, mEditText.getText().toString());
+	    calIntent.putExtra("beginTime", getParkingTime());
 	    startActivity(calIntent);
 	}
 
-	private Calendar parkingTime() {
+	private long getParkingTime() {
 	    Calendar cal = Calendar.getInstance();
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH);
-        int day = cal.get(Calendar.DAY_OF_WEEK);
-        Log.i(LOG_TAG, "year: " + year + ", month: " + month + ", day: " + day);
-        return cal;
+
+        int currHour = cal.get(Calendar.HOUR_OF_DAY);
+        int currDay = cal.get(Calendar.DAY_OF_WEEK);
+        int parkingDay = (int)mCurrDay + 1;
+        int parkingHour = (int)mCurrTime + 6;
+        int incrementDay = 0;
+        if (currDay == parkingDay) {
+            if (parkingHour < currHour) {
+                incrementDay = 7;
+            }
+        } else if (parkingDay > currDay) {
+            incrementDay = parkingDay - currDay;
+        } else {
+            incrementDay = (parkingDay + 7) - currDay;
+        }
+        Log.i(LOG_TAG, "parkingDay: " + parkingDay);
+        Log.i(LOG_TAG, "currDay: " + currDay);
+        Log.i(LOG_TAG, "incrementDay: " + incrementDay);
+        cal.roll(Calendar.DAY_OF_WEEK, incrementDay);
+        cal.set(Calendar.HOUR_OF_DAY, parkingHour);
+        cal.set(Calendar.MINUTE, 0);
+
+        return cal.getTimeInMillis();
         
 	}
 
