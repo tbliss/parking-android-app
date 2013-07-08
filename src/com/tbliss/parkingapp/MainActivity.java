@@ -36,6 +36,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 public class MainActivity extends Activity implements OnItemSelectedListener, LocationListener {
 	private static final String LOG_TAG = "MainActivity";
@@ -171,6 +172,8 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
 
 		mSavedLat = mCurrLoc.getLatitude();
 		mSavedLon = mCurrLoc.getLongitude();
+
+		Toast.makeText(getApplicationContext(), "Parking location saved", Toast.LENGTH_SHORT).show();
 	}
 
 	/**
@@ -243,6 +246,5 @@ public class MainActivity extends Activity implements OnItemSelectedListener, Lo
 }
 
 // TODO:
-// change spinner to picker
 // check if gps enabled, what to do if turned off
 
